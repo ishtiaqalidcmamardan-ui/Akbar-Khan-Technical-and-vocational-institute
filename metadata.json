@@ -1,0 +1,9 @@
+{
+  "name": "Akbar Khan Institute (Regd. TTB)",
+  "description": "A comprehensive portal for a technical and vocational institute providing free skills training to underprivileged women, featuring an admission portal, LMS, and donation system.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "display-capture"
+  ]
+}

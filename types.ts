@@ -1,5 +1,6 @@
 
 export interface Course {
+  /* Changed id to string to match constants.ts implementation */
   id: string;
   title: string;
   description: string;
@@ -7,8 +8,8 @@ export interface Course {
   duration: string;
   image: string;
   status: 'active' | 'scheduled' | 'frozen';
-  nextClassTime?: string; // ISO String
-  contents?: string[]; // Detailed curriculum points
+  nextClassTime?: string;
+  contents?: string[];
 }
 
 export type UserRole = 'admin' | 'instructor' | 'student';
@@ -20,16 +21,8 @@ export interface Product {
   price: string;
   category: 'Textile' | 'Handcrafted' | 'Digital';
   image: string;
-  gallery?: string[]; // Multiple viewpoints of the product
+  gallery?: string[];
   isHero?: boolean;
-}
-
-export interface LiveSessionConfig {
-  courseId: string;
-  instructorName: string;
-  instructorImage: string;
-  timing: string;
-  announcement: string;
 }
 
 export interface ClassroomParticipant {
@@ -45,6 +38,7 @@ export interface ClassroomParticipant {
 }
 
 export interface Student extends UserProfile {
+  /* Updated course related fields to string to match Course id change */
   enrolledCourses: string[];
   courseId: string;
   courseProgress?: Record<string, number>;
@@ -64,11 +58,11 @@ export interface Student extends UserProfile {
   admissionStatus: 'pending' | 'approved' | 'rejected';
   applicationDate: string;
   passportPhoto?: string;
-  isDraft?: boolean;
+  registrationNumber?: string;
 }
 
 export interface UserProfile {
-  id: string;
+  id: number | string;
   firstName: string;
   lastName: string;
   email: string;
@@ -76,14 +70,6 @@ export interface UserProfile {
   password?: string;
   dateOfBirth?: string;
   mobileNumber?: string;
-}
-
-export interface AttendanceLog {
-  date: string;
-  course_id: string;
-  present_student_ids: string[];
-  total_present: number;
-  timestamp: string;
 }
 
 export interface ResultRecord {
@@ -104,16 +90,6 @@ export interface ResultRecord {
   status: 'Pass' | 'Fail';
 }
 
-export interface Achievement {
-  id: string;
-  name: string;
-  course: string;
-  percentage: string;
-  year: string;
-  image: string;
-  award: 'Gold Medal' | 'Silver Medal' | 'Bronze Medal' | 'Excellence';
-}
-
 export interface AdmissionData {
   firstName: string;
   lastName: string;
@@ -132,6 +108,7 @@ export interface AdmissionData {
   scoreValue: string;
   lastSubject: string;
   status: string;
+  /* Updated courseId to string to match Course id change */
   courseId: string;
   background: string;
   passportPhoto: string;
@@ -154,4 +131,15 @@ export interface Testimonial {
   impact: string;
   image: string;
   year: string;
+}
+
+/* Added missing Achievement interface required by constants.ts */
+export interface Achievement {
+  id: string;
+  name: string;
+  course: string;
+  percentage: string;
+  year: string;
+  image: string;
+  award: string;
 }

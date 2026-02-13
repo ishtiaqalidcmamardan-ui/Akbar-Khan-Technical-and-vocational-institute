@@ -102,7 +102,8 @@ const Boutique: React.FC = () => {
           </div>
           <div className="lg:col-span-6 relative h-[350px] sm:h-[550px] md:h-[850px]">
             <div className="absolute top-0 right-0 w-full sm:w-[85%] h-full sm:h-[95%] overflow-hidden shadow-[0_50px_100px_-20px_rgba(225,29,72,0.15)] rounded-[2.5rem] md:rounded-[3rem]">
-              <EditableImage id="boutique_hero_main" defaultSrc="https://images.unsplash.com/photo-1594463750939-ebb6bd2d233e?q=80&w=1200" className="w-full h-full object-cover" />
+              {/* Optimized: Explicitly requested fm=webp */}
+              <EditableImage id="boutique_hero_main" defaultSrc="https://images.unsplash.com/photo-1594463750939-ebb6bd2d233e?fm=webp&q=80&w=1200" className="w-full h-full object-cover" />
             </div>
             <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-amber-400/20 rounded-full blur-3xl"></div>
           </div>
@@ -177,7 +178,6 @@ const Boutique: React.FC = () => {
         <ProductGallery product={activeGalleryProduct} onClose={() => setActiveGalleryProduct(null)} />
       )}
       
-      {/* Background Decor */}
       <div className="fixed top-1/2 left-0 w-64 h-64 bg-rose-200/10 rounded-full blur-[100px] pointer-events-none -z-10"></div>
       <div className="fixed bottom-0 right-0 w-96 h-96 bg-amber-100/10 rounded-full blur-[120px] pointer-events-none -z-10"></div>
     </div>

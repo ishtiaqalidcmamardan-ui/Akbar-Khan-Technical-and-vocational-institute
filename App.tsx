@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { HashRouter, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { NAV_LINKS, INSTITUTION_LINE_1, INSTITUTION_LINE_2 } from './constants.ts';
 import Home from './pages/Home.tsx';
@@ -16,9 +16,6 @@ import SearchOverlay from './components/SearchOverlay.tsx';
 import { Student, UserProfile } from './types.ts';
 import { EditableText } from './components/EditableText.tsx';
 import { EditableImage } from './components/EditableImage.tsx';
-import { contentService } from './services/contentService.ts';
-import { EditProvider } from './components/EditContext.tsx';
-import { FloatingToolbar } from './components/FloatingToolbar.tsx';
 import { LiveSessionProvider } from './components/LiveSessionContext.tsx';
 
 interface NavbarProps {
@@ -31,7 +28,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, onOpenAuth, onOpenSearch }) => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
-  useEffect(() => {
+  React.useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
 
@@ -203,10 +200,6 @@ const AppContent: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    contentService.syncFromCloud();
-  }, []);
-
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar user={currentUser} onOpenAuth={handleOpenAuth} onOpenSearch={() => setIsSearchOpen(true)} />
@@ -232,20 +225,17 @@ const AppContent: React.FC = () => {
         isOpen={isSearchOpen} 
         onClose={() => setIsSearchOpen(false)} 
       />
-      {currentUser?.role === 'admin' && <FloatingToolbar userRole={currentUser.role} />}
     </div>
   );
 };
 
 const App: React.FC = () => {
   return (
-    <EditProvider>
-      <LiveSessionProvider>
-        <HashRouter>
-          <AppContent />
-        </HashRouter>
-      </LiveSessionProvider>
-    </EditProvider>
+    <LiveSessionProvider>
+      <HashRouter>
+        <AppContent />
+      </HashRouter>
+    </LiveSessionProvider>
   );
 };
 

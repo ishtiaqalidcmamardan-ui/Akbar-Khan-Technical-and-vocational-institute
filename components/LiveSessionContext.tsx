@@ -50,7 +50,6 @@ export const LiveSessionProvider: React.FC<{ children: ReactNode }> = ({ childre
   const [currentDeviceId, setCurrentDeviceId] = useState<string | null>(null);
   const [broadcastMsg, setBroadcastMsgState] = useState(localStorage.getItem('ak_global_broadcast') || '');
 
-  // Visual Tuning State
   const [visuals, setVisuals] = useState<VisualSettings>({
     brightness: 100,
     contrast: 100,
@@ -68,19 +67,20 @@ export const LiveSessionProvider: React.FC<{ children: ReactNode }> = ({ childre
     window.dispatchEvent(new Event('ak_broadcast_updated'));
   };
 
-  const stopAllTracks = (stream: MediaStream | null) => {
+  // FORCEFUL HARDWARE TERMINATION
+  const stopAllTracks = useCallback((stream: MediaStream | null) => {
     if (stream) {
       stream.getTracks().forEach(track => {
-        track.stop();
         track.enabled = false;
+        track.stop(); // Terminates hardware access
       });
     }
-  };
+  }, []);
 
   const startCamera = async (deviceId?: string) => {
     try {
       if (!window.isSecureContext) {
-        alert("HTTPS required for media.");
+        alert("Institutional Encryption (HTTPS) required for secure LMS operations.");
         return;
       }
 
@@ -92,9 +92,10 @@ export const LiveSessionProvider: React.FC<{ children: ReactNode }> = ({ childre
         audio: true,
         video: {
           deviceId: deviceId ? { exact: deviceId } : undefined,
-          width: { ideal: isMobileDevice ? 1080 : 1280 },
-          height: { ideal: isMobileDevice ? 1920 : 720 },
-          facingMode: deviceId ? undefined : "user"
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          facingMode: deviceId ? undefined : "user",
+          frameRate: { ideal: 30 }
         }
       };
 
@@ -109,7 +110,7 @@ export const LiveSessionProvider: React.FC<{ children: ReactNode }> = ({ childre
       if (videoTrack) setCurrentDeviceId(videoTrack.getSettings().deviceId || null);
 
     } catch (err: any) {
-      console.error("Camera access failed", err);
+      console.error("LMS Media Initialization Error:", err);
     }
   };
 
@@ -126,7 +127,7 @@ export const LiveSessionProvider: React.FC<{ children: ReactNode }> = ({ childre
 
       await startCamera(nextDevice.deviceId);
     } catch (err) {
-      console.error("Cycling failed", err);
+      console.error("Camera node transition failed", err);
     }
   };
 
@@ -134,25 +135,19 @@ export const LiveSessionProvider: React.FC<{ children: ReactNode }> = ({ childre
     if (!activeStream) return;
     const track = activeStream.getVideoTracks()[0];
     if (!track) return;
-
     try {
       const capabilities = track.getCapabilities() as any;
       if (!capabilities.torch) return;
-
       const newState = !isTorchOn;
-      await track.applyConstraints({
-        advanced: [{ torch: newState }]
-      } as any);
+      await track.applyConstraints({ advanced: [{ torch: newState }] } as any);
       setIsTorchOn(newState);
-    } catch (err) {
-      console.error("Torch error", err);
-    }
+    } catch (err) { console.error(err); }
   };
 
   const startScreenShare = async () => {
     if (isMobileDevice) return;
     try {
-      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
       stopAllTracks(screenStream);
       setScreenStream(stream);
       setSessionMode('screen');
@@ -171,16 +166,22 @@ export const LiveSessionProvider: React.FC<{ children: ReactNode }> = ({ childre
     setIsLive(true);
   };
 
-  const terminateSession = () => {
+  const terminateSession = useCallback(() => {
+    // 1. Forcefully stop all tracks for all streams
     stopAllTracks(activeStream);
     stopAllTracks(screenStream);
+    
+    // 2. Clear refs and states
     setActiveStream(null);
     setScreenStream(null);
+    if (mediaUrl) URL.revokeObjectURL(mediaUrl);
     setMediaUrl(null);
     setIsLive(false);
     setSessionMode('none');
     setIsTorchOn(false);
-  };
+    setIsMuted(false);
+    setIsCameraOff(false);
+  }, [activeStream, screenStream, mediaUrl, stopAllTracks]);
 
   const toggleMute = () => {
     if (activeStream) {

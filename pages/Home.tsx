@@ -167,7 +167,7 @@ const AccountHub: React.FC<{ onLogin: (u: UserProfile | Student, redirect?: stri
           <div className="w-full lg:w-1/2">
             <EditableText id="portal_hub_badge" defaultText="AUTHORIZED INSTITUTIONAL ACCESS" className="text-emerald-800 font-black uppercase tracking-[0.5em] text-[10px] block mb-6" />
             <h2 className="text-4xl md:text-7xl font-serif text-slate-900 mb-8 leading-[1.1]">Portal <br/><span className="italic text-emerald-600">& Governance</span></h2>
-            <p className="text-base md:text-lg text-slate-500 leading-relaxed max-w-lg mb-12">Securely access the Learning Management System or verify institutional records.</p>
+            <p className="text-base md:text-lg text-slate-500 leading-relaxed font-light max-w-lg mb-12">Securely access the Learning Management System or verify institutional records.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <Link to="/admission" className="p-8 bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:border-emerald-200 transition-all group">
                   <div className="w-12 h-12 bg-emerald-50 text-emerald-700 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-700 group-hover:text-white transition-colors">
@@ -214,11 +214,9 @@ const AccountHub: React.FC<{ onLogin: (u: UserProfile | Student, redirect?: stri
 const MosaicBackground: React.FC = () => {
   return (
     <div className="absolute inset-0 z-0 overflow-hidden grid grid-cols-12 grid-rows-2 gap-1 md:gap-3 p-1 md:p-3 opacity-[0.7] lg:opacity-[0.85] pointer-events-none transition-opacity duration-1000">
-      {/* BUILDING FRONT - The primary visual anchor */}
       <div className="col-span-8 row-span-2 rounded-[2rem] md:rounded-[4rem] overflow-hidden bg-emerald-950 shadow-inner border border-emerald-900/10">
          <img src={GALLERY_ASSETS[0].src} className="w-full h-full object-cover ken-burns brightness-90" alt="Main Building Front" />
       </div>
-      {/* SECONDARY TILES - IT Hub & Vocational Labs */}
       <div className="col-span-4 row-span-1 rounded-[1.5rem] md:rounded-[3rem] overflow-hidden bg-teal-950 shadow-inner">
          <img src={GALLERY_ASSETS[4].src} className="w-full h-full object-cover brightness-75 opacity-90" alt="IT Hub" />
       </div>
@@ -243,11 +241,9 @@ const Home: React.FC<HomeProps> = ({ user, onDemoLogin, onOpenAuth }) => {
     <div className="animate-fade-in bg-white overflow-x-hidden">
       <TickerSystem onJoin={handleJoinClassroom} />
       
-      {/* HERO SECTION WITH MOSAIC BACKGROUND */}
       <section className="relative min-h-[90vh] flex items-center bg-white overflow-hidden py-20 md:py-0">
         <MosaicBackground />
         
-        {/* SUBTLE GRADIENT FOR TEXT FOCUS - Highly transparent to show background */}
         <div className="absolute inset-0 bg-gradient-to-tr from-white/30 via-transparent to-transparent pointer-events-none z-[1]"></div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
@@ -257,7 +253,6 @@ const Home: React.FC<HomeProps> = ({ user, onDemoLogin, onOpenAuth }) => {
               <EditableText id="hero_badge_light" defaultText="PREMIER TTB-CERTIFIED INSTITUTE" className="text-[10px] font-black uppercase tracking-[0.3em] block" />
             </div>
             
-            {/* HERO TEXT WITH HIGH CONTRAST SOLID OUTLINE (PERFORMANCE OPTIMIZED) */}
             <h1 
                className="text-5xl md:text-[9rem] font-serif text-slate-950 mb-10 leading-[1.05] md:leading-[0.8] tracking-tighter"
                style={{ 
@@ -293,7 +288,6 @@ const Home: React.FC<HomeProps> = ({ user, onDemoLogin, onOpenAuth }) => {
           </div>
         </div>
 
-        {/* CORNER PICTURE HUB: LOWERED DOWN BY 7PTS EQUIVALENT */}
         <div className="absolute -bottom-8 right-12 z-20">
            {!activeGallery ? (
              <button 
@@ -339,13 +333,13 @@ const Home: React.FC<HomeProps> = ({ user, onDemoLogin, onOpenAuth }) => {
         </div>
       </section>
 
-      {/* Philosophy Section */}
       <section className="py-24 md:py-40 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
              <div className="relative">
                 <div className="aspect-[4/5] rounded-[3.5rem] overflow-hidden shadow-2xl relative z-10 group border-8 border-white">
-                   <EditableImage id="philosophy_img_light" defaultSrc="https://images.unsplash.com/photo-1556740758-90de374c12ad?auto=format&fit=crop&q=80&w=1200" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                   {/* Optimized: fit explicitly requested as webp */}
+                   <EditableImage id="philosophy_img_light" defaultSrc="https://images.unsplash.com/photo-1556740758-90de374c12ad?fm=webp&fit=crop&q=80&w=1200" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
                 </div>
                 <div className="absolute -top-12 -left-12 w-64 h-64 bg-emerald-50 rounded-[3rem] -z-10 rotate-12"></div>
              </div>
@@ -368,7 +362,6 @@ const Home: React.FC<HomeProps> = ({ user, onDemoLogin, onOpenAuth }) => {
         </div>
       </section>
 
-      {/* Course Ticker */}
       <section className="bg-slate-50 py-24 md:py-32 overflow-hidden border-y border-emerald-50">
         <div className="flex flex-col gap-12">
            <div className="px-6 text-center">
@@ -391,7 +384,6 @@ const Home: React.FC<HomeProps> = ({ user, onDemoLogin, onOpenAuth }) => {
         </div>
       </section>
 
-      {/* CEO Message */}
       <section className="py-24 md:py-40 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="bg-slate-50 rounded-[4rem] p-12 md:p-24 flex flex-col lg:flex-row gap-20 items-center relative overflow-hidden border border-emerald-100 shadow-xl">
@@ -411,7 +403,6 @@ const Home: React.FC<HomeProps> = ({ user, onDemoLogin, onOpenAuth }) => {
         </div>
       </section>
 
-      {/* Boutique Preview */}
       <section className="py-24 md:py-40 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6">
            <div className="flex flex-col md:flex-row justify-between items-end gap-10 mb-20">
@@ -434,7 +425,6 @@ const Home: React.FC<HomeProps> = ({ user, onDemoLogin, onOpenAuth }) => {
         </div>
       </section>
 
-      {/* Campus Map Section */}
       <section className="py-24 md:py-40 bg-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <div className="inline-block mb-12">

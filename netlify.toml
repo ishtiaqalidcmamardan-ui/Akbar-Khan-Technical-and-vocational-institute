@@ -1,0 +1,19 @@
+
+[build]
+  # Explicit build command for your React application
+  command = "npm run build"
+  
+  # The directory where your build tool (like Vite or Webpack) outputs files
+  publish = "dist"
+
+[build.environment]
+  # Force Netlify to skip the automatic Next.js runtime/plugin detection
+  NETLIFY_SKIP_NEXTJS_PLUGIN = "true"
+  # Ensures other Next-related checks are bypassed
+  NEXT_PLUGIN_FORCE_RUN = "false"
+
+[[redirects]]
+  # Essential for React SPAs using HashRouter or BrowserRouter to prevent 404s on refresh
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -218,8 +218,7 @@ const Admission: React.FC<{ onEnroll: (s: Student) => void }> = ({ onEnroll }) =
     email: '', password: '', mobileNumber: '', guardianContact: '', address: '', dateOfBirth: '',
     qualification: '', majorSubject: '', scoreType: 'Percentage', scoreValue: '',
     lastSubject: '', status: 'Student', 
-    // Fix: courseId must be a number as defined in AdmissionData interface.
-    courseId: 0, background: '',
+    courseId: '', background: '',
     passportPhoto: '', nicNumber: ''
   });
   
@@ -336,8 +335,7 @@ const Admission: React.FC<{ onEnroll: (s: Student) => void }> = ({ onEnroll }) =
                   <div className="space-y-3">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Academic Specialization</label>
                     <select required className="w-full p-5 bg-white border border-slate-800 rounded-none text-slate-900 font-black text-[11px] uppercase tracking-widest appearance-none cursor-pointer outline-none transition-all" value={formData.courseId} 
-                    // Fix: Convert string value from select to number for courseId.
-                    onChange={e => setFormData({...formData, courseId: Number(e.target.value)})}>
+                    onChange={e => setFormData({...formData, courseId: e.target.value})}>
                       <option value="">Select Path...</option>
                       {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
                     </select>

@@ -46,7 +46,7 @@ export const GALLERY_ASSETS = [
 
 export const COURSES: Course[] = [
   {
-    id: 1,
+    id: 'fashion-design',
     title: 'Fashion Designing & Textile Art',
     description: 'Master the art of garment construction, design principles, and textile selection under TTB certification.',
     category: 'Vocational',
@@ -56,7 +56,7 @@ export const COURSES: Course[] = [
     contents: ['Sketching & Illustration', 'Pattern Making', 'Draping', 'Textile Science', 'Embroidery & Embellishment', 'Business of Fashion']
   },
   {
-    id: 2,
+    id: 'ms-office',
     title: 'Advanced Computer Skills (MS Office)',
     description: 'Comprehensive training in Word, Excel, and PowerPoint tailored for administrative and corporate excellence.',
     category: 'Technical',
@@ -66,7 +66,7 @@ export const COURSES: Course[] = [
     contents: ['MS Word (Advanced Formatting)', 'MS Excel (Data Analysis & Pivot)', 'MS PowerPoint (Premium Pitching)', 'Outlook & Communication', 'Data Entry & Typing Mastery']
   },
   {
-    id: 3,
+    id: 'digital-marketing',
     title: 'Digital Marketing & E-Commerce',
     description: 'Learn SEO, social media management, and modern content strategy to lead in the digital economy.',
     category: 'Professional',
@@ -76,7 +76,7 @@ export const COURSES: Course[] = [
     contents: ['Search Engine Optimization (SEO)', 'Social Media Management', 'Content Marketing', 'Google Ads (SEM)', 'Email Marketing', 'Affiliate Marketing & E-commerce']
   },
   {
-    id: 4,
+    id: 'graphic-design',
     title: 'Graphics Designing & Visual Arts',
     description: 'Adobe Suite mastery, branding, and visual communication fundamentals for future designers.',
     category: 'Technical',

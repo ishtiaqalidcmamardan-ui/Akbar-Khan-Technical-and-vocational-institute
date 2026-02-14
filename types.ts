@@ -1,6 +1,7 @@
 
 export interface Course {
-  id: number;
+  /* Changed id to string to match constants.ts implementation */
+  id: string;
   title: string;
   description: string;
   category: 'Technical' | 'Creative' | 'Professional' | 'Vocational';
@@ -37,8 +38,9 @@ export interface ClassroomParticipant {
 }
 
 export interface Student extends UserProfile {
-  enrolledCourses: number[];
-  courseId: number;
+  /* Updated course related fields to string to match Course id change */
+  enrolledCourses: string[];
+  courseId: string;
   courseProgress?: Record<string, number>;
   guardianName?: string;
   guardianRelation?: string;
@@ -106,7 +108,8 @@ export interface AdmissionData {
   scoreValue: string;
   lastSubject: string;
   status: string;
-  courseId: number;
+  /* Updated courseId to string to match Course id change */
+  courseId: string;
   background: string;
   passportPhoto: string;
   nicNumber: string;
@@ -130,6 +133,7 @@ export interface Testimonial {
   year: string;
 }
 
+/* Added missing Achievement interface required by constants.ts */
 export interface Achievement {
   id: string;
   name: string;

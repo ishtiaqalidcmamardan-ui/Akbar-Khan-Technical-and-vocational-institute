@@ -17,6 +17,7 @@ import { Student, UserProfile } from './types.ts';
 import { EditableText } from './components/EditableText.tsx';
 import { EditableImage } from './components/EditableImage.tsx';
 import { LiveSessionProvider } from './components/LiveSessionContext.tsx';
+import { isSupabaseConfigured } from './services/supabase.ts';
 
 interface NavbarProps {
   user: (UserProfile | Student) | null;
@@ -25,157 +26,170 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ user, onOpenAuth, onOpenSearch }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
 
   React.useEffect(() => {
-    setIsOpen(false);
+    setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
-  const handleNavLinkClick = (e: React.MouseEvent, path: string, name: string) => {
-    if (name === 'LMS' && !user) {
-      e.preventDefault();
-      setIsOpen(false);
-      onOpenAuth('/lms');
-    }
-  };
-
   return (
-    <nav className="bg-teal-950 shadow-2xl sticky top-0 z-50 no-print">
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-3 lg:py-5 border-b border-teal-900/50">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center flex-shrink-0 min-w-0">
-            <Link to="/" className="flex items-center gap-3 lg:gap-5 group min-w-0">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 relative flex-shrink-0">
-                <EditableImage 
-                  id="nav_logo_v4" 
-                  defaultSrc="https://i.ibb.co/vz6W1yW/logo.png" 
-                  className="w-full h-full rounded-full border-2 border-teal-500/30 bg-white shadow-lg overflow-hidden" 
-                  alt="Institute Badge"
-                />
-              </div>
-              <div className="flex flex-col min-w-0 justify-center">
-                <EditableText 
-                  id="nav_inst_line1_v6" 
-                  tag="h1" 
-                  defaultText={INSTITUTION_LINE_1} 
-                  className="text-[10px] sm:text-xs md:text-lg lg:text-xl font-black text-white leading-none uppercase tracking-tight truncate" 
-                />
-                <EditableText 
-                  id="nav_inst_line2_v6" 
-                  tag="h2" 
-                  defaultText={INSTITUTION_LINE_2} 
-                  className="text-[8px] sm:text-[9px] md:text-sm lg:text-base font-black text-teal-400 leading-none uppercase tracking-wider mt-0.5" 
-                />
-              </div>
-            </Link>
+    <header className="sticky top-0 z-[100] no-print">
+      <div className="bg-slate-950 text-white/70 py-2 border-b border-white/5">
+        <div className="max-w-[1600px] mx-auto px-4 lg:px-10 flex justify-between items-center">
+          <div className="flex items-center gap-6">
+            <a href="tel:+923001234567" className="hidden sm:flex items-center gap-2 text-[9px] font-black uppercase tracking-widest hover:text-fuchsia-400 transition-colors">
+              <i className="fa-solid fa-phone text-[8px]"></i> +92 300 1234567
+            </a>
+            <a href="mailto:info@ak-institute.edu.pk" className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest hover:text-fuchsia-400 transition-colors">
+              <i className="fa-solid fa-envelope text-[8px]"></i> info@ak-institute.edu.pk
+            </a>
           </div>
-
-          <div className="flex items-center gap-2 sm:gap-6 ml-4">
-            <button 
-              onClick={onOpenSearch}
-              className="p-3 text-teal-100/60 hover:text-white hover:bg-white/10 rounded-full transition-all group"
-              aria-label="Open Institutional Search"
-            >
-              <svg className="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeWidth="2.5"/></svg>
-            </button>
-
-            <div className="hidden sm:flex items-center gap-2">
-              {user ? (
-                <Link to="/lms" className="px-5 py-3 bg-amber-500 text-amber-950 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-amber-400 shadow-xl transition-all whitespace-nowrap">
-                  My Portal
-                </Link>
-              ) : (
-                <div className="flex gap-2">
-                  <button onClick={() => onOpenAuth()} className="px-5 py-3 bg-teal-800 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-teal-700 transition-all whitespace-nowrap">
-                    Sign In
-                  </button>
-                  <Link to="/admission" className="hidden lg:block px-5 py-3 bg-teal-500 text-teal-950 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-teal-400 shadow-lg transition-all whitespace-nowrap">
-                    Apply Now
-                  </Link>
-                </div>
-              )}
+          <div className="flex items-center gap-4">
+            <span className="hidden md:inline text-[9px] font-black uppercase tracking-[0.2em] text-white/30 border-r border-white/10 pr-4">Regd. TTB Node</span>
+            <div className="flex gap-3">
+              <a href="#" className="hover:text-fuchsia-400 transition-colors"><i className="fa-brands fa-facebook-f text-xs"></i></a>
+              <a href="#" className="hover:text-fuchsia-400 transition-colors"><i className="fa-brands fa-whatsapp text-xs"></i></a>
             </div>
-            
-            <button 
-              onClick={() => setIsOpen(true)} 
-              className="md:hidden flex items-center gap-2 px-3 py-2 bg-teal-600/20 text-teal-400 rounded-lg font-black text-[9px] uppercase tracking-[0.2em] transition-all active:scale-95 border border-teal-400/30"
-              aria-label="Open Navigation Menu"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-              <span>Menu</span>
-            </button>
           </div>
         </div>
       </div>
 
-      <div className="hidden md:block bg-teal-900/30 backdrop-blur-md">
-        <div className="max-w-[1600px] mx-auto px-6 lg:px-10 overflow-x-auto no-scrollbar">
-          <div className="flex items-center h-12 gap-1 lg:gap-2">
+      <nav className="bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm">
+        <div className="max-w-[1600px] mx-auto px-4 lg:px-10 h-20 lg:h-24 flex justify-between items-center">
+          <Link to="/" className="flex items-center gap-3 lg:gap-5 group">
+            <div className="w-12 h-12 lg:w-16 lg:h-16 flex-shrink-0">
+              <EditableImage 
+                id="nav_logo_v2" 
+                defaultSrc="https://i.ibb.co/vz6W1yW/logo.png" 
+                className="w-full h-full rounded-full border border-slate-100 bg-white shadow-sm p-1" 
+                alt="Institutional Seal"
+              />
+            </div>
+            <div className="hidden sm:flex flex-col border-l border-slate-200 pl-4 lg:pl-5">
+              <EditableText 
+                id="nav_inst_line1_v2" 
+                tag="h1" 
+                defaultText={INSTITUTION_LINE_1} 
+                className="text-xs lg:text-lg font-bold text-slate-900 leading-tight uppercase tracking-tight font-serif" 
+              />
+              <EditableText 
+                id="nav_inst_line2_v2" 
+                tag="h2" 
+                defaultText={INSTITUTION_LINE_2} 
+                className="text-[9px] lg:text-xs font-semibold text-fuchsia-600 leading-none tracking-widest mt-0.5" 
+              />
+            </div>
+          </Link>
+
+          <div className="hidden lg:flex items-center gap-1">
             {NAV_LINKS.map((link) => (
               <Link 
                 key={link.path} 
                 to={link.path} 
-                onClick={(e) => handleNavLinkClick(e, link.path, link.name)}
-                className={`px-4 py-2 rounded-lg text-[9px] lg:text-[11px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all relative ${
                   location.pathname === link.path 
-                    ? 'bg-teal-600 text-white shadow-lg' 
-                    : 'text-teal-100/60 hover:text-white hover:bg-teal-800/50'
+                    ? 'text-fuchsia-600 bg-fuchsia-50' 
+                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
                 {link.name}
               </Link>
             ))}
           </div>
-        </div>
-      </div>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-[100] md:hidden">
-          <div className="absolute inset-0 bg-teal-950/95 backdrop-blur-md" onClick={() => setIsOpen(false)} />
-          <div className="absolute top-0 right-0 h-full w-[280px] bg-white shadow-2xl flex flex-col animate-scale-in border-l border-teal-500/10">
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-              <span className="text-teal-600 font-black text-[10px] uppercase tracking-[0.4em]">Index</span>
-              <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-rose-500 p-2 transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path d="M6 18L18 6M6 6l12 12" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <button onClick={onOpenSearch} className="p-3 text-slate-400 hover:text-fuchsia-600 hover:bg-fuchsia-50 rounded-full transition-all">
+              <i className="fa-solid fa-magnifying-glass text-lg"></i>
+            </button>
+            <div className="hidden md:flex items-center gap-2">
+              {user ? (
+                <Link to="/lms" className="px-6 py-3 bg-slate-900 text-white rounded-full text-[9px] font-black uppercase tracking-widest hover:bg-fuchsia-600 transition-all shadow-xl shadow-slate-200">
+                  <i className="fa-solid fa-user-graduate mr-2"></i> Student Portal
+                </Link>
+              ) : (
+                <button onClick={() => onOpenAuth()} className="px-6 py-3 bg-fuchsia-600 text-white rounded-full text-[9px] font-black uppercase tracking-widest hover:bg-fuchsia-700 shadow-xl shadow-fuchsia-100 transition-all">
+                  <i className="fa-solid fa-lock mr-2"></i> LMS Login
+                </button>
+              )}
             </div>
-            
-            <div className="flex-grow p-4 space-y-1 overflow-y-auto bg-white">
-              {NAV_LINKS.map(link => (
-                <Link 
-                  key={link.path} 
-                  to={link.path} 
-                  onClick={(e) => handleNavLinkClick(e, link.path, link.name)}
-                  className={`block px-6 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                    location.pathname === link.path 
-                      ? 'bg-teal-50 text-teal-700 font-black' 
-                      : 'text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
+            <button onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden w-12 h-12 flex items-center justify-center bg-slate-50 text-slate-900 rounded-xl border border-slate-200">
+              <i className="fa-solid fa-bars-staggered text-xl"></i>
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-[1000] lg:hidden">
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity" onClick={() => setIsMobileMenuOpen(false)}></div>
+          <div className="absolute right-0 top-0 h-full w-[80%] max-w-sm bg-white shadow-2xl animate-scale-in origin-right flex flex-col">
+            <div className="p-8 bg-slate-950 text-white flex flex-col gap-6">
+              <div className="flex justify-between items-start">
+                <div className="w-16 h-16 bg-white rounded-2xl p-2 shadow-xl">
+                  <img src="https://i.ibb.co/vz6W1yW/logo.png" className="w-full h-full object-contain" alt="Logo" />
+                </div>
+                <button onClick={() => setIsMobileMenuOpen(false)} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all">
+                  <i className="fa-solid fa-xmark text-lg"></i>
+                </button>
+              </div>
+              <div>
+                <h3 className="text-lg font-serif">Academic Node</h3>
+                <p className="text-[9px] font-black text-fuchsia-400 uppercase tracking-widest">Akbar Khan Foundation</p>
+              </div>
+              <div className="flex gap-2">
+                {user ? (
+                  <Link to="/lms" className="flex-grow py-3 bg-fuchsia-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest text-center">My Learning</Link>
+                ) : (
+                  <button onClick={() => { setIsMobileMenuOpen(false); onOpenAuth(); }} className="flex-grow py-3 bg-fuchsia-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest">Sign In</button>
+                )}
+                <Link to="/admission" className="px-6 py-3 bg-white text-slate-900 rounded-xl text-[9px] font-black uppercase tracking-widest">Apply</Link>
+              </div>
+            </div>
+            <div className="flex-grow overflow-y-auto p-4 space-y-1">
+              <p className="px-4 py-4 text-[9px] font-black text-slate-400 uppercase tracking-[0.4em] border-b border-slate-50 mb-2">Main Directory</p>
+              {NAV_LINKS.map((link) => (
+                <Link key={link.path} to={link.path} className={`flex items-center gap-4 px-4 py-4 rounded-xl text-sm font-bold transition-all ${location.pathname === link.path ? 'bg-fuchsia-50 text-fuchsia-700' : 'text-slate-600 hover:bg-slate-50'}`}>
+                  <i className={`fa-solid ${link.name === 'Home' ? 'fa-house' : link.name === 'About' ? 'fa-circle-info' : link.name === 'Courses' ? 'fa-book-open' : link.name === 'Results' ? 'fa-graduation-cap' : link.name === 'Admission' ? 'fa-id-card' : 'fa-circle-dot'} w-5 text-center opacity-40 text-xs`}></i>
                   {link.name}
                 </Link>
               ))}
             </div>
-            
-            <div className="p-6 border-t border-gray-100 bg-gray-50 space-y-3">
-              {user ? (
-                <Link to="/lms" className="block w-full py-4 bg-amber-500 text-amber-950 rounded-xl font-black text-[10px] uppercase tracking-widest text-center shadow-md">My Portal</Link>
-              ) : (
-                <>
-                  <button onClick={() => { setIsOpen(false); onOpenAuth(); }} className="w-full py-4 bg-teal-800 text-white rounded-xl font-black text-[10px] uppercase tracking-widest">Sign In</button>
-                  <Link to="/admission" className="block w-full py-4 bg-teal-500 text-teal-950 rounded-xl font-black text-[10px] uppercase tracking-widest text-center shadow-lg">Apply Now</Link>
-                </>
-              )}
+            <div className="p-8 border-t border-slate-100 bg-slate-50/50">
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-4">Official Contact</p>
+              <div className="space-y-3">
+                <a href="tel:+923001234567" className="flex items-center gap-3 text-xs text-slate-600 font-bold"><i className="fa-solid fa-phone text-fuchsia-600"></i> +92 300 1234567</a>
+                <a href="mailto:info@ak-institute.edu.pk" className="flex items-center gap-3 text-xs text-slate-600 font-bold"><i className="fa-solid fa-envelope text-fuchsia-600"></i> Support Node</a>
+              </div>
             </div>
           </div>
         </div>
       )}
-    </nav>
+    </header>
+  );
+};
+
+const Footer: React.FC = () => {
+  return (
+    <footer className="bg-slate-900 text-white py-12 border-t border-white/5 no-print">
+      <div className="max-w-[1600px] mx-auto px-6 lg:px-10">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex flex-col gap-2">
+            <h4 className="text-xl font-serif">{INSTITUTION_LINE_1}</h4>
+            <p className="text-fuchsia-400 text-xs font-black uppercase tracking-widest">{INSTITUTION_LINE_2}</p>
+          </div>
+          <div className="flex gap-4">
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-full border ${isSupabaseConfigured ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-rose-500/10 border-rose-500/50 text-rose-400'}`}>
+              <div className={`w-1.5 h-1.5 rounded-full ${isSupabaseConfigured ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'}`}></div>
+              <span className="text-[9px] font-black uppercase tracking-widest">{isSupabaseConfigured ? 'DB Connected' : 'DB Disconnected'}</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full border bg-white/5 border-white/10 text-white/40">
+              <span className="text-[9px] font-black uppercase tracking-widest">© 2024 AK Foundation</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 };
 
@@ -216,15 +230,9 @@ const AppContent: React.FC = () => {
           <Route path="/boutique" element={<Boutique />} />
         </Routes>
       </main>
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
-        onLogin={handleLogin} 
-      />
-      <SearchOverlay 
-        isOpen={isSearchOpen} 
-        onClose={() => setIsSearchOpen(false)} 
-      />
+      <Footer />
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onLogin={handleLogin} />
+      <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </div>
   );
 };

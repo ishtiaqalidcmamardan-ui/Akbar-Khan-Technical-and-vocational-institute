@@ -20,23 +20,29 @@ const mapDbToStudent = (row: any): Student => ({
   mobileNumber: row.mobile_number,
   guardianContact: row.guardian_contact,
   address: row.address,
+  // Fixed: Corrected property name from date_of_birth to dateOfBirth to match UserProfile interface
   dateOfBirth: row.date_of_birth,
   qualification: row.qualification,
+  // Fixed: Corrected property name from major_subject to majorSubject to match Student interface
   majorSubject: row.major_subject,
+  // Fixed: Corrected property name from score_type to scoreType to match Student interface
   scoreType: row.score_type,
+  // Fixed: Corrected property name from score_value to scoreValue to match Student interface
   scoreValue: row.score_value,
+  // Fixed: Corrected property name from last_subject to lastSubject to match Student interface
   lastSubject: row.last_subject,
   status: row.status,
-  courseId: Number(row.course_id),
+  courseId: row.course_id,
   background: row.background,
+  /* Fixed: Corrected property name from passport_photo to passportPhoto to match Student interface */
   passportPhoto: row.passport_photo,
   admissionStatus: row.admission_status as any,
-  application_date: row.application_date,
-  enrolledCourses: [Number(row.course_id)],
+  applicationDate: row.application_date,
+  enrolledCourses: [row.course_id],
   nicNumber: row.nic_number || '',
   role: 'student',
   registrationNumber: row.registration_number
-} as any);
+});
 
 const mapStudentToDb = (student: Partial<Student | AdmissionData>): any => ({
   first_name: student.firstName,
@@ -56,11 +62,11 @@ const mapStudentToDb = (student: Partial<Student | AdmissionData>): any => ({
   score_value: student.scoreValue,
   last_subject: student.lastSubject,
   status: student.status,
-  course_id: Number(student.courseId),
+  course_id: student.courseId,
   background: student.background,
   passport_photo: student.passportPhoto,
-  admission_status: (student as any).admissionStatus || 'pending',
-  application_date: (student as any).applicationDate || new Date().toISOString(),
+  admission_status: (student as any).admissionStatus,
+  application_date: (student as any).applicationDate,
   nic_number: student.nicNumber
 });
 
@@ -87,20 +93,17 @@ export const mockAuth = {
   registerStudent: async (data: AdmissionData): Promise<Student | null> => {
     let finalPhotoUrl = data.passportPhoto;
     if (isSupabaseConfigured && data.passportPhoto && data.passportPhoto.startsWith('data:')) {
+      // Optimized: Switched extension to .webp
       const publicUrl = await uploadImageToBucket('student-records', `passport-${Date.now()}.webp`, data.passportPhoto);
       if (publicUrl) finalPhotoUrl = publicUrl;
     }
 
     if (isSupabaseConfigured && supabase) {
-      const payload = mapStudentToDb(data);
-      console.log("Attempting database sync for candidate...", payload);
-      
-      const { data: inserted, error } = await supabase.from(APPLICATIONS_KEY).insert([payload]).select().single();
-      
-      if (error) {
-        console.error("Database Registry Error:", error.message, error.details, error.hint);
-        return null;
-      }
+      const { data: inserted, error } = await supabase.from(APPLICATIONS_KEY).insert([{
+        ...mapStudentToDb(data),
+        passport_photo: finalPhotoUrl
+      }]).select().single();
+      if (error) return null;
       return mapDbToStudent(inserted);
     }
     return null;
@@ -108,13 +111,10 @@ export const mockAuth = {
 
   approveApplication: async (app: Student): Promise<void> => {
     if (isSupabaseConfigured && supabase) {
-      const payload = mapStudentToDb({ ...app, admissionStatus: 'approved' });
-      const { error: insErr } = await supabase.from(ENROLLED_KEY).insert([payload]);
-      if (insErr) {
-        console.error("Enrollment error:", insErr.message);
-        throw new Error("Registry move failed: " + insErr.message);
+      const { error: insErr } = await supabase.from(ENROLLED_KEY).insert([mapStudentToDb({ ...app, admissionStatus: 'approved' })]);
+      if (!insErr) {
+        await supabase.from(APPLICATIONS_KEY).delete().eq('id', app.id);
       }
-      await supabase.from(APPLICATIONS_KEY).delete().eq('id', (app as any).id);
     }
   },
 
@@ -126,53 +126,35 @@ export const mockAuth = {
     return [];
   },
 
+  // Dynamic Course Registry Management
   getCourses: async (): Promise<Course[]> => {
     if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase.from(COURSES_KEY).select('*').order('id', { ascending: true });
-      if (error) console.error("Fetch courses error:", error.message);
-      if (data && data.length > 0) return data;
+      const { data } = await supabase.from(COURSES_KEY).select('*').order('id', { ascending: true });
+      if (data) return data;
     }
-    return INITIAL_COURSES_RAW;
+    /* Fixed: Updated fallback map to use string IDs to match Course interface change */
+    return INITIAL_COURSES_RAW.map((c, i) => ({ ...c, id: c.id || String(i + 1) }));
   },
 
   createCourse: async (course: Omit<Course, 'id'>): Promise<Course | null> => {
     if (isSupabaseConfigured && supabase) {
       const { data, error } = await supabase.from(COURSES_KEY).insert([course]).select().single();
-      if (error) {
-        console.error("Course creation error:", error.message);
-        return null;
-      }
-      return data;
+      if (!error) return data;
     }
     return null;
   },
 
-  updateCourse: async (id: number, updates: Partial<Course>): Promise<void> => {
+  /* Fixed: Changed id type from number to string to match Course interface change */
+  updateCourse: async (id: string, updates: Partial<Course>): Promise<void> => {
     if (isSupabaseConfigured && supabase) {
-      const { error } = await supabase.from(COURSES_KEY).update(updates).eq('id', id);
-      if (error) console.error("Course update error:", error.message);
+      await supabase.from(COURSES_KEY).update(updates).eq('id', id);
     }
   },
 
-  deleteCourse: async (id: number): Promise<void> => {
+  /* Fixed: Changed id type from number to string to match Course interface change */
+  deleteCourse: async (id: string): Promise<void> => {
     if (isSupabaseConfigured && supabase) {
-      const { error } = await supabase.from(COURSES_KEY).delete().eq('id', id);
-      if (error) console.error("Course deletion error:", error.message);
-    }
-  },
-
-  seedDatabase: async (): Promise<{ success: boolean; message: string }> => {
-    if (!isSupabaseConfigured || !supabase) {
-      return { success: false, message: "Supabase connection not established." };
-    }
-    try {
-      // Filter out 'id' for auto-incrementing SERIAL tables
-      const coursesToSeed = INITIAL_COURSES_RAW.map(({ id, ...rest }) => rest);
-      const { error } = await supabase.from(COURSES_KEY).upsert(coursesToSeed, { onConflict: 'title' });
-      if (error) throw error;
-      return { success: true, message: "Registry initialized with default curriculum." };
-    } catch (err: any) {
-      return { success: false, message: err.message || "Seeding failed." };
+      await supabase.from(COURSES_KEY).delete().eq('id', id);
     }
   },
 

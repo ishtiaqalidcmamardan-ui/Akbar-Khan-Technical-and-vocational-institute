@@ -1,8 +1,8 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
 
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
+const supabaseUrl = process.env.https://tkjbktaawukvjcjxfmyl.supabase.co || '';
+const supabaseAnonKey = process.env.sb_publishable_A8lgHgq-d6RBcIUbb4yY3g_54gnUk28 || '';
 
 export const isSupabaseConfigured = supabaseUrl !== '' && supabaseAnonKey !== '';
 
